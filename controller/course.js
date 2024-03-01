@@ -145,4 +145,67 @@ router.post('/BookingCourseToMain/:subject_id', async (request, response) => {
     }
 })
 
+router.post("/EnableCourse/:id", async(request, response) => {
+    const subject_id = request.params.id
+    // update enable state to subject
+    try {
+        const query = await pool.query("UPDATE mykusubjecttable SET enable = 1 WHERE subject_id = ?",[subject_id])
+        const result = await query[0]
+        response.json({
+            status: 'success',
+            data: result
+        })
+    } catch (error) {
+        console.error(error);
+        response.json({status: 'error', message: error});
+    }
+});
+
+router.post("/DisableCourse/:id", async(request, response) => {
+    const subject_id = request.params.id
+    // update enable state to subject
+    try {
+        const query = await pool.query("UPDATE mykusubjecttable SET enable = 0 WHERE subject_id = ?",[subject_id])
+        const result = await query[0]
+        response.json({
+            status: 'success',
+            data: result
+        })
+    } catch (error) {
+        console.error(error);
+        response.json({status: 'error', message: error});
+    }
+});
+
+router.post('/')
+
+router.post("/importFromExcel", async (req, res) => {
+    try {
+      const { subject_id,
+          subject_nameEN,
+          subject_nameTH,
+          credit,
+          type,
+          school_year } = req.body;
+  
+      // Loop through each item in formDataWithYear and insert it into the database
+      const enableData = 0;
+      await pool.query('INSERT INTO mykusubjecttable (subject_id, subject_nameEN, subject_nameTH, credit, enable, type, school_year) VALUES (?, ?, ?, ?, ?, ?, ?)', [ 
+      subject_id,
+      subject_nameEN,
+      subject_nameTH,
+      credit,
+      enableData,
+      type,
+      school_year,
+      ]);
+  
+      // Send a success response
+      res.status(200).json({ message: "Data inserted successfully" });
+    } catch (error) {
+      console.error(error);
+      // Send an error response if something goes wrong
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
 module.exports = router;

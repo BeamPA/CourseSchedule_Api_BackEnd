@@ -64,6 +64,29 @@ router.post('/importRoom', async(request ,response) => {
     }
 })
 
+router.post("/importFromExcelroom", async (req, res) => {
+    try {
+      const { room_number,
+          room_seat,
+           } = req.body;
+  
+      // Loop through each item in formDataWithYear and insert it into the database
+      const room_isFull = 0;
+      await pool.query('INSERT INTO mykuroomtable (room_number, room_seat, room_isFull) VALUES (?, ?, ?)', [ 
+      room_number,
+      room_seat,
+      room_isFull,
+      ]);
+  
+      // Send a success response
+      res.status(200).json({ message: "Data inserted successfully" });
+    } catch (error) {
+      console.error(error);
+      // Send an error response if something goes wrong
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
 // update room
 router.post('/updateRoom/:id', async(request ,response) => {
     const id = request.params.id
@@ -81,10 +104,10 @@ router.post('/updateRoom/:id', async(request ,response) => {
 })
 
 // delete room
-router.post('/deleteRoom/:id',async(request ,response) => {
-    const id = request.params.id
+router.post('/deleteRoom/:room_number',async(request ,response) => {
+    const room_number = request.params.room_number
     try {
-        const query = await pool.query('DELETE mykuroomtable WHERE room_id = ?',[id])
+        const query = await pool.query('DELETE mykuroomtable WHERE room_number = ?',[parseInt(room_number)])
         const result = await query[0]
         response.json({
             status: 'delete room successfully'
